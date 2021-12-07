@@ -1,18 +1,38 @@
 const router = require('express').Router();
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
-// The `/api/products` endpoint
-
-// get all products
 router.get('/', (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
+  try {
+    Product.findAll({
+      include: [
+        { model: Category, model: Tag }
+      ]
+    }).then(m_product => res.status(200).json(m_product));
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-// get one product
 router.get('/:id', (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+  try {
+    Product.findOne({
+      where: {
+        id: req.params.id
+      },
+      include: [
+        { model: Category, model: Tag }
+      ]
+    })
+    .then(m_product => {
+      if (!m_product) {
+        res.status(404).json({ message: "Can't find product with this Id" }); 
+        return; 
+      }
+      res.status(200).json(m_product);
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 // create new product
@@ -55,13 +75,13 @@ router.put('/:id', (req, res) => {
       id: req.params.id,
     },
   })
-    .then((product) => {
+    .then((m_product) => {
       // find all associated tags from ProductTag
       return ProductTag.findAll({ where: { product_id: req.params.id } });
     })
-    .then((productTags) => {
+    .then((m_productTags) => {
       // get list of current tag_ids
-      const productTagIds = productTags.map(({ tag_id }) => tag_id);
+      const productTagIds = m_productTags.map(({ tag_id }) => tag_id);
       // create filtered list of new tag_ids
       const newProductTags = req.body.tagIds
         .filter((tag_id) => !productTagIds.includes(tag_id))
