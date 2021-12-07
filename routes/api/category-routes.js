@@ -1,28 +1,66 @@
 const router = require('express').Router();
 const { Category, Product } = require('../../models');
 
-// The `/api/categories` endpoint
-
 router.get('/', (req, res) => {
-  // find all categories
-  // be sure to include its associated Products
+  try {
+    Category.findAll({
+      include: [
+        { model: Product }
+      ]
+    }).then(m_category => res.json(m_category));
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.get('/:id', (req, res) => {
-  // find one category by its `id` value
-  // be sure to include its associated Products
+  try {
+    Category.findOne({
+      where: {
+        id: req.params.id
+      },
+      include: [
+        { model: Product }
+      ]
+    })
+    .then(m_category => {
+      if (!m_category) {
+        res.status(404).json({ message: "Can't find category with this Id" }); 
+        return; 
+      }
+      res.json(m_category);
+    });
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.post('/', (req, res) => {
-  // create a new category
+  try {
+    Category.create({
+      category_name: req.body.category_name
+    }).then(m_category => res.json(m_category));
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.put('/:id', (req, res) => {
   // update a category by its `id` value
+  try {
+   
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 router.delete('/:id', (req, res) => {
   // delete a category by its `id` value
+  try {
+   
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
