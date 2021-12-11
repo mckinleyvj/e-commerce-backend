@@ -40,18 +40,19 @@ router.post('/', (req, res) => {
   Product.create(req.body)
     .then((m_product) => {
       if (req.body.tagIds.length) {
-        const productTagIdArr = req.body.tagIds.map((tag_id) => {
+        const m_productTag = req.body.tagIds.map((tag_id) => {
           return {
-            product_id: product.id,
+            product_id: m_product.id,
             tag_id,
           };
         });
-        return ProductTag.bulkCreate(productTagIdArr);
+        return ProductTag.bulkCreate(m_productTag);
       }
       res.status(200).json(m_product);
     })
-    .then((m_productTagIds) => res.status(200).json(m_productTagIds));
+    .then((m_productTag) => res.status(200).json(m_productTag));
   } catch (err) {
+    console.log(err);
     res.status(500).json(err);
   }
 });
